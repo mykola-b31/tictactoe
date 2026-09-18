@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Хрестики-нолики</string>
+    <string name="logo_description">Логотип гри: хрестик і нолик</string>
+    <string name="login_title">Авторизація</string>
+    <string name="login">Логін</string>
+    <string name="password">Пароль</string>
+    <string name="sign_in">Увійти</string>
+    <string name="required_field">Заповніть це поле</string>
+    <string name="player_name">Гравець: %1$s</string>
+    <string name="player_turn">Ваш хід (X)</string>
+    <string name="ai_turn">Хід комп’ютера (O)…</string>
+    <string name="game_finished">Гру завершено</string>
+    <string name="restart">Почати заново</string>
+    <string name="exit">Вийти</string>
+    <string name="result_title">Результат гри</string>
+    <string name="player_won">Ви перемогли!</string>
+    <string name="ai_won">Комп’ютер переміг.</string>
+    <string name="draw">Нічия.</string>
+    <string name="ok">Ок</string>
+    <string name="again">Заново</string>
+    <string name="cell_description">Рядок %1$d, стовпець %2$d: %3$s</string>
+    <string name="empty_cell">порожньо</string>
+</resources>

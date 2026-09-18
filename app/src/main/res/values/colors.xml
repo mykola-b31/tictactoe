@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#365F91</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="background">#FFFFFF</color>
+    <color name="text">#202124</color>
+    <color name="outline">#70757A</color>
+    <color name="error">#B3261E</color>
+</resources>

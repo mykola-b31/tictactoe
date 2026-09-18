@@ -1,0 +1,51 @@
+# Android and Gradle
+.gradle/
+.kotlin/
+**/build/
+local.properties
+.externalNativeBuild/
+.cxx/
+captures/
+
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+*.iml
+
+# Android signing
+*.jks
+*.keystore
+*.keystore.properties
+key.properties
+secrets.properties
+
+# Android Studio and IntelliJ IDEA
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+dist/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
