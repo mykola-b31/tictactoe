@@ -34,22 +34,37 @@ object TicTacToeGame {
 
     fun findBestMove(board: String): Int {
         if (result(board) != Result.PLAYING || isPlayerTurn(board)) return -1
-        return board.indices.filter { board[it] == EMPTY }.maxByOrNull { index ->
-            minimax(board.replaceRange(index, index + 1, AI.toString()), aiTurn = false, depth = 0)
-        } ?: -1
+
+        val availableMoves = board.indices.filter { board[it] == EMPTY }
+
+        findWinningMove(board, AI)?.let { return it }
+
+        findWinningMove(board, PLAYER)?.let { return it }
+
+        /*if (board[4] == EMPTY) {
+            return 4
+        }*/
+
+        return availableMoves.randomOrNull() ?: -1
     }
 
-    private fun minimax(board: String, aiTurn: Boolean, depth: Int): Int {
-        when (result(board)) {
-            Result.AI_WON -> return 10 - depth
-            Result.PLAYER_WON -> return depth - 10
-            Result.DRAW -> return 0
-            Result.PLAYING -> Unit
+    private fun findWinningMove(board: String, mark: Char): Int? {
+        val expectedResult = when (mark) {
+            AI -> Result.AI_WON
+            PLAYER -> Result.PLAYER_WON
+            else -> return null
         }
-        val mark = if (aiTurn) AI else PLAYER
-        val scores = board.indices.filter { board[it] == EMPTY }.map { index ->
-            minimax(board.replaceRange(index, index + 1, mark.toString()), !aiTurn, depth + 1)
-        }
-        return if (aiTurn) scores.max() else scores.min()
+
+        return board.indices
+            .filter { board[it] == EMPTY }
+            .firstOrNull { index ->
+                val nextBoard = board.replaceRange(
+                    index,
+                    index + 1,
+                    mark.toString()
+                )
+
+                result(nextBoard) == expectedResult
+            }
     }
 }
