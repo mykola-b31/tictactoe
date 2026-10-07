@@ -1,11 +1,9 @@
 package ua.cn.stu.tictactoe
 
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -14,18 +12,20 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import ua.cn.stu.tictactoe.ui.splash.SplashScreen
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.commit
+import ua.cn.stu.tictactoe.ui.splash.SplashFragment
 
-class SplashActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         useLightSystemBars()
-        setContent {
-            AppTheme {
-                SplashScreen {
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    finish()
-                }
+        setContentView(R.layout.activity_main)
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.fragment_container, SplashFragment())
             }
         }
     }

@@ -2,11 +2,7 @@ package ua.cn.stu.tictactoe.ui.splash
 
 import android.os.SystemClock
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -16,11 +12,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.constraintlayout.compose.ConstraintLayout
 import kotlinx.coroutines.delay
 import ua.cn.stu.tictactoe.R
 
@@ -34,15 +30,31 @@ fun SplashScreen(onFinished: () -> Unit) {
         delay((2_000L - elapsed).coerceAtLeast(0L))
         currentOnFinished()
     }
-    Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painterResource(R.drawable.app_logo),
-                contentDescription = stringResource(R.string.logo_description),
-                modifier = Modifier.size(dimensionResource(R.dimen.logo_size))
-            )
-            Spacer(Modifier.height(dimensionResource(R.dimen.spacing)))
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
-        }
+    ConstraintLayout(Modifier.fillMaxSize().safeDrawingPadding()) {
+        val (logo, title) = createRefs()
+        val spacing = dimensionResource(R.dimen.spacing)
+
+        Image(
+            painterResource(R.drawable.app_logo),
+            contentDescription = stringResource(R.string.logo_description),
+            modifier = Modifier
+                .size(dimensionResource(R.dimen.logo_size))
+                .constrainAs(logo) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    verticalBias = 0.43f
+                }
+        )
+        Text(
+            stringResource(R.string.app_name),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.constrainAs(title) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(logo.bottom, spacing)
+            }
+        )
     }
 }

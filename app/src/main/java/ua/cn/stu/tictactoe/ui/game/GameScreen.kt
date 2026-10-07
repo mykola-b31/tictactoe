@@ -38,25 +38,31 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import kotlinx.coroutines.Dispatchers
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import ua.cn.stu.tictactoe.R
 import ua.cn.stu.tictactoe.game.TicTacToeGame
 import ua.cn.stu.tictactoe.game.TicTacToeGame.Result
 
 @Composable
-fun GameScreen(playerName: String, onExit: () -> Unit) {
+fun GameScreen(
+    playerName: String,
+    aiAvailable: Boolean,
+    onRequestAiMove: suspend (String) -> Int,
+    onExit: () -> Unit
+) {
     var board by rememberSaveable { mutableStateOf(TicTacToeGame.NEW_BOARD) }
     val result = TicTacToeGame.result(board)
     val playerTurn = TicTacToeGame.isPlayerTurn(board)
 
-    LaunchedEffect(board) {
-        if (result == Result.PLAYING && !playerTurn) {
+    LaunchedEffect(board, aiAvailable) {
+        if (result == Result.PLAYING && !playerTurn && aiAvailable) {
             val snapshot = board
             delay(300)
-            val index = withContext(Dispatchers.Default) { TicTacToeGame.findBestMove(snapshot) }
-            if (board == snapshot && index >= 0) board = TicTacToeGame.move(snapshot, index, TicTacToeGame.AI)
+            val index = onRequestAiMove(snapshot)
+            if (board == snapshot && index >= 0)
+                board = TicTacToeGame.move(snapshot, index, TicTacToeGame.AI)
         }
     }
     val spacing = dimensionResource(R.dimen.spacing)
@@ -75,25 +81,77 @@ fun GameScreen(playerName: String, onExit: () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().padding(padding)) {
         if (maxWidth > maxHeight) {
             val boardSize = minOf(maxBoard, maxHeight, (maxWidth - spacing) / 2).coerceAtLeast(144.dp)
-            Row(
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(spacing, Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                GameBoard(board, playerTurn && result == Result.PLAYING, play, Modifier.size(boardSize))
-                GameControls(playerName, status, restart, onExit, Modifier.widthIn(max = dimensionResource(R.dimen.content_width)).weight(1f))
+            ConstraintLayout(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                val (gameBoard, controls) = createRefs()
+                GameBoard(
+                    board,
+                    playerTurn && result == Result.PLAYING,
+                    play,
+                    Modifier.size(boardSize).constrainAs(gameBoard) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    }
+                )
+                GameControls(playerName,
+                    status,
+                    restart,
+                    onExit,
+                    Modifier
+                        .widthIn(max = dimensionResource(R.dimen.content_width))
+                        .constrainAs(controls) {
+                            start.linkTo(gameBoard.end, spacing)
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            width = Dimension.fillToConstraints
+                        }
+                )
             }
         } else {
-            val boardSize = minOf(maxBoard, maxWidth, (maxHeight - 220.dp).coerceAtLeast(144.dp))
-            Column(
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(spacing, Alignment.CenterVertically)
-            ) {
-                Text(stringResource(R.string.player_name, playerName), style = MaterialTheme.typography.titleLarge)
-                Text(stringResource(status))
-                GameBoard(board, playerTurn && result == Result.PLAYING, play, Modifier.size(boardSize))
-                GameButtons(restart, onExit, Modifier.widthIn(max = maxBoard).fillMaxWidth())
+            val boardSize = minOf(
+                maxBoard,
+                maxWidth,
+                (maxHeight - 220.dp).coerceAtLeast(144.dp)
+            )
+
+            ConstraintLayout(Modifier.fillMaxSize()) {
+                val content = createRef()
+
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = maxBoard)
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .constrainAs(content) {
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(spacing)
+                ) {
+                    Text(
+                        text = stringResource(R.string.player_name, playerName),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
+                    Text(stringResource(status))
+
+                    GameBoard(
+                        board = board,
+                        enabled = playerTurn && result == Result.PLAYING,
+                        onCellClick = play,
+                        modifier = Modifier.size(boardSize)
+                    )
+
+                    GameButtons(
+                        onRestart = restart,
+                        onExit = onExit,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }

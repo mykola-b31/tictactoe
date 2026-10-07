@@ -10,10 +10,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.TicTacToe">
-        <activity android:name=".GameActivity" android:exported="false" />
-        <activity android:name=".LoginActivity" android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".SplashActivity" android:exported="true">
+        <service
+            android:name=".service.GameMoveService"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
